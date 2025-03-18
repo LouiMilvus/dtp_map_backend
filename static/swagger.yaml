@@ -1,0 +1,320 @@
+openapi: 3.0.0
+info:
+  title: DTP Map API
+  description: API для получения данных по ДТП, объектам и словарям
+  version: 1.0.0
+
+servers:
+  - url: "{server_url}"
+    description: Production server
+    variables:
+      server_url:
+        default: "https://server-name.ru"
+        description: "API сервер"
+
+paths:
+
+  # =========================
+  # Маршруты для ДТП
+  # =========================
+  /dtp/api/dtp/coord:
+    get:
+      summary: Получение данных о ДТП с фильтрацией
+      description: Возвращает данные ДТП с фильтрацией по году, МО и виду ДТП.
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: Год ДТП
+          schema:
+            type: integer
+            example: 2024
+        - name: mo
+          in: query
+          required: false
+          description: ID муниципального образования
+          schema:
+            type: integer
+            example: 1
+        - name: vid_dtp
+          in: query
+          required: false
+          description: ID вида ДТП
+          schema:
+            type: integer
+            example: 2
+      responses:
+        "200":
+          description: Успешный ответ с данными ДТП
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_kard:
+                      type: integer
+                      example: 12345
+                    year:
+                      type: integer
+                      example: 2024
+                    mo:
+                      type: integer
+                      example: 1
+                    vid_dtp:
+                      type: integer
+                      example: 3
+                    coord_w:
+                      type: number
+                      example: 55.7558
+                    coord_l:
+                      type: number
+                      example: 37.6173
+
+  /dtp/api/dtp/card/{id_kard}:
+    get:
+      summary: Получение карточки ДТП
+      description: Возвращает карточку ДТП по id_kard
+      parameters:
+        - name: id_kard
+          in: path
+          required: true
+          description: ID карточки ДТП
+          schema:
+            type: integer
+            example: 221973828
+      responses:
+        "200":
+          description: Успешный ответ с карточкой ДТП
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_kard:
+                    type: integer
+                    example: 221973828
+                  Дата:
+                    type: string
+                    example: "12.03.2024"
+                  Вид ДТП:
+                    type: integer
+                    example: 3
+                  Муниципальное образование:
+                    type: integer
+                    example: 1
+                  Погодные условия:
+                    type: integer
+                    example: 5
+                  Состояние проезжей части:
+                    type: integer
+                    example: 2
+                  Освещение:
+                    type: integer
+                    example: 4
+                  Вина:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        Транспортное средство №:
+                          type: string
+                          example: "1"
+                        Водитель:
+                          type: object
+                          properties:
+                            Степень тяжести:
+                              type: string
+                              example: "Не пострадал"
+                            Нарушение:
+                              type: array
+                              items:
+                                type: integer
+                                example: 87
+
+  # =========================
+  # Маршруты для объектов
+  # =========================
+  /dtp/api/objects/traffic_cameras:
+    get:
+      summary: Данные по камерам
+      description: Возвращает данные по камерам в формате JSON.
+      responses:
+        "200":
+          description: Успешный ответ с данными о камерах
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    coord_w:
+                      type: number
+                      example: 55.7558
+                    coord_l:
+                      type: number
+                      example: 37.6173
+                    type_data:
+                      type: integer
+                      example: 2
+                    metka_mo:
+                      type: integer
+                      example: 2
+
+  /dtp/api/objects/uchrez:
+    get:
+      summary: Данные по учреждениям
+      description: Возвращает данные об учреждениях в формате JSON.
+      responses:
+        "200":
+          description: Успешный ответ с данными об учреждениях
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_uchrez:
+                      type: integer
+                      example: 2
+                    coord_w:
+                      type: number
+                      example: 55.7558
+                    coord_l:
+                      type: number
+                      example: 37.6173
+                    type_data:
+                      type: integer
+                      example: 2
+
+  # =========================
+  # Маршруты для словарей
+  # =========================
+  /dtp/api/dict/mo:
+    get:
+      summary: Словарь МО
+      description: Возвращает данные по муниципальным образованиям.
+      responses:
+        "200":
+          description: Успешный ответ с данными МО
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    mo:
+                      type: string
+                      example: "Москва"
+
+  /dtp/api/dict/narusheniya:
+    get:
+      summary: Словарь нарушений
+      description: Возвращает данные по нарушениям.
+      responses:
+        "200":
+          description: Успешный ответ с данными нарушений
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    narushenie:
+                      type: string
+                      example: "Проезд на красный свет"
+
+  /dtp/api/dict/osveshenie:
+    get:
+      summary: Словарь освещения
+      description: Возвращает данные по условиям освещения.
+      responses:
+        "200":
+          description: Успешный ответ с данными освещения
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    osveshenie:
+                      type: string
+                      example: "Темное время суток"
+
+  /dtp/api/dict/sost_pogodi:
+    get:
+      summary: Словарь погодных условий
+      description: Возвращает данные по состоянию погоды.
+      responses:
+        "200":
+          description: Успешный ответ с данными погодных условий
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    sost_pogodi:
+                      type: string
+                      example: "Дождь"
+
+  /dtp/api/dict/sost_proez_chasti:
+    get:
+      summary: Словарь состояния проезжей части
+      description: Возвращает данные по состоянию проезжей части.
+      responses:
+        "200":
+          description: Успешный ответ с данными проезжей части
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    sost_proez_chasti:
+                      type: string
+                      example: "Гололед"
+
+  /dtp/api/dict/vid_dtp:
+    get:
+      summary: Словарь видов ДТП
+      description: Возвращает данные по видам ДТП.
+      responses:
+        "200":
+          description: Успешный ответ с данными видов ДТП
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 3
+                    vid_dtp:
+                      type: string
+                      example: "Столкновение"
