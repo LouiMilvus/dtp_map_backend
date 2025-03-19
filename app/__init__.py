@@ -1,17 +1,15 @@
 from flask import Flask
-from app.routes import init_routes
 from flask_cors import CORS
+from flask_swagger_ui import get_swaggerui_blueprint
+from dotenv import load_dotenv
+import os
+
 from parsers.dtp_parser import start as dtp
 from parsers.objects_parser import start as object
-
-from flask_swagger_ui import get_swaggerui_blueprint
 
 from app.routes_dtp import dtp_bp
 from app.routes_objects import objects_bp
 from app.routes_dict import dict_bp
-
-from dotenv import load_dotenv
-import os
 
 # Загрузка переменных окружения
 load_dotenv()
@@ -31,7 +29,9 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    
+    # Добавляем CORS для всех маршрутов
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Регистрация маршрутов
     app.register_blueprint(dtp_bp, url_prefix='/dtp/api')

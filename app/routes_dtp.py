@@ -10,6 +10,13 @@ dtp_bp = Blueprint('dtp', __name__)
 # Путь к CSV-файлу
 DATA_FILE = '/opt/dtp_map_backend/data/dtp/output/output.csv'
 
+# Словарь для преобразования type в нужные имена
+TYPE_MAP = {
+    "Водитель": "driver",
+    "Пассажир": "passenger",
+    "Пешеход": "pedestrian"
+}
+
 # Вспомогательная функция для загрузки данных и фильтрации
 def load_and_filter_dtp(year=None, mo=None, vid_dtp=None):
     try:
@@ -49,10 +56,10 @@ def get_dtp_coord():
 # Вспомогательная функция для загрузки данных по id_kard
 def get_card_by_id(id_kard):
     try:
-        # 🔥 Загружаем данные
+        # Загружаем данные
         df = pd.read_csv(DATA_FILE)
 
-        # 🔥 Фильтрация по id_kard
+        # Фильтрация по id_kard
         card = df[df['id_kard'] == int(id_kard)].to_dict(orient='records')
 
         if not card:
@@ -63,60 +70,74 @@ def get_card_by_id(id_kard):
         # ✅ Парсим вину в массив объектов
         vina_raw = card.get('vina', '[]')
 
-        # 🔥 Отладочный вывод содержимого vina
-        #print(f"DEBUG - raw vina: {repr(vina_raw)}")
-
-        # 🔥 Обработка NaN и пустых значений
+        # Обработка NaN и пустых значений
         if isinstance(vina_raw, float) and np.isnan(vina_raw):
             vina_raw = '[]'
 
-        # 🔥 Убираем лишние кавычки, если они есть
+        # Убираем лишние кавычки, если они есть
         if vina_raw.startswith('"') and vina_raw.endswith('"'):
             vina_raw = vina_raw[1:-1]
 
-        # 🔥 Исправляем NaN → None и кортежи → списки
+        # Исправляем NaN → None и кортежи → списки
         vina_fixed = vina_raw.replace('nan', 'None')
         vina_fixed = re.sub(r'\((.*?)\)', r'[\1]', vina_fixed)
 
-        # 🔥 Парсинг в массив Python-объектов
+        # Парсинг в массив Python-объектов
         try:
             vina_list = ast.literal_eval(vina_fixed)
         except (SyntaxError, ValueError):
             vina_list = []
 
-        # ✅ Форматирование вины
+        # Форматирование вины в нужный формат
         vina_formatted = []
 
         for item in vina_list:
             if not isinstance(item, dict) or item.get('type') in [None, 'nan']:
                 continue
 
-            # Создаем объект с данными
-            entity = {
-                "Транспортное средство №": f"{item.get('number_ts', 'N/A')}",
-                item.get('type', 'N/A'): {
-                    "Степень тяжести": item.get('stepen_tyazhesti', 'N/A'),
-                    "Нарушение": list(item.get('narushenie', []))
-                }
-            }
-            vina_formatted.append(entity)
+            type_name = item.get('type', 'N/A')
+            type_key = TYPE_MAP.get(type_name, 'unknown')
 
-        # ✅ Формирование итогового ответа
+            vina_formatted.append({
+                "number_ts": {
+                    "title": "Транспортное средство №",
+                    "value": f"{item.get('number_ts', 'N/A')}"
+                },
+                type_key: {
+                    "title": type_name,
+                    "value": {
+                        "stepen_tyazhesti": {
+                            "title": "Степень тяжести",
+                            "value": item.get('stepen_tyazhesti', 'N/A')
+                        },
+                        "narushenie": {
+                            "title": "Нарушения",
+                            "value": list(item.get('narushenie', []))
+                        }
+                    }
+                }
+            })
+
+        # Формирование итогового ответа
         result = {
-            "id_kard": card['id_kard'],
-            "Дата": card['date_dtp'],
-            "Вид ДТП": card['vid_dtp'],
-            "Муниципальное образование": card['mo'],
-            "Погодные условия": card['sost_pogodi'],
-            "Состояние проезжей части": card['sost_proez_chasti'],
-            "Освещение": card['osveshenie'],
-            "Вина": vina_formatted
+            "id_kard": {"title": "ID карточки", "value": card['id_kard']},
+            "date_dtp": {"title": "Дата ДТП", "value": card['date_dtp']},
+            "vid_dtp": {"title": "Вид ДТП", "value": card['vid_dtp']},
+            "mo": {"title": "Муниципальный округ", "value": card['mo']},
+            "sost_pogodi": {"title": "Состояние погоды", "value": card['sost_pogodi']},
+            "sost_proez_chasti": {"title": "Состояние проезжей части", "value": card['sost_proez_chasti']},
+            "osveshenie": {"title": "Освещение", "value": card['osveshenie']},
+            "vina": {
+                "title": "Вина",
+                "value": vina_formatted
+            }
         }
 
         return result
 
     except Exception as e:
         return {"error": str(e)}
+
 
 # Маршрут для получения карточки по id_kard
 @dtp_bp.route('/dtp/card/<int:id_kard>', methods=['GET'])
