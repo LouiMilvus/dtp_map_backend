@@ -6,6 +6,8 @@ file_dtp_path_output = config.FILE_DTP_PATH_OUTPUT
 
 narusheniya_dict_path_output = config.FILE_PATH_NARUSHENIYA
 mo_dict_path_output = config.FILE_PATH_MO
+ndu_dict_path_output = config.FILE_PATH_NDU
+sdor_dict_path_output = config.FILE_PATH_SDOR
 vid_dtp_dict_path_output = config.FILE_PATH_VID_DTP
 sost_pogodi_dict_path_output = config.FILE_PATH_SOST_POGODI
 sost_proez_chasti_dict_path_output = config.FILE_PATH_SOST_PROEZ_CHASTI
@@ -105,6 +107,8 @@ columns_mapping = {
     'date_dtp': 'date_dtp',
     'mo': 'mo',
     'vid_dtp': 'vid_dtp',
+    'ndu': 'ndu',
+    'sdor': 'sdor',
     'pog': 'pogibshie',
     'run': 'ranenie',
     'k_ts': 'kol_ts',
@@ -161,7 +165,7 @@ for col in ['narushenie_pdd_passazhir', 'soput_narush_pdd_passazhir',
     df[col] = df[col].apply(map_violations_to_ids)
 
 extra_fields = [
-    'date_dtp', 'mo', 'vid_dtp', 'address', 'pogibshie', 'ranenie',
+    'date_dtp', 'mo', 'vid_dtp','ndu','sdor', 'address', 'pogibshie', 'ranenie',
     'kol_ts', 'kol_uch', 'number_dtp', 'sost_pogodi', 'sost_proez_chasti',
     'osveshenie', 'coord_w', 'coord_l','narushenie_pdd_passazhir', 'soput_narush_pdd_passazhir',
             'narushenie_pdd_peshehod', 'soput_narush_pdd_peshehod'
@@ -174,14 +178,19 @@ agg_dict['vina'] = lambda x: list(
 
 
 df_grouped = df.groupby('id_kard', as_index=False).agg(agg_dict)
+df_grouped['death'] = df_grouped['pogibshie'] > 0
 
 df_mo = pd.DataFrame({'id': range(1, len(df['mo'].unique()) + 1), 'mo': df['mo'].unique()})
+df_ndu = pd.DataFrame({'id': range(1, len(df['ndu'].unique()) + 1), 'ndu': df['ndu'].unique()})
+df_sdor = pd.DataFrame({'id': range(1, len(df['sdor'].unique()) + 1), 'sdor': df['sdor'].unique()})
 df_vid_dtp = pd.DataFrame({'id': range(1, len(df['vid_dtp'].unique()) + 1), 'vid_dtp': df['vid_dtp'].unique()})
 df_sost_pogodi = pd.DataFrame({'id': range(1, len(df['sost_pogodi'].unique()) + 1), 'sost_pogodi': df['sost_pogodi'].unique()})
 df_sost_proez_chasti = pd.DataFrame({'id': range(1, len(df['sost_proez_chasti'].unique()) + 1), 'sost_proez_chasti': df['sost_proez_chasti'].unique()})
 df_osveshenie = pd.DataFrame({'id': range(1, len(df['osveshenie'].unique()) + 1), 'osveshenie': df['osveshenie'].unique()})
 
 df_grouped['mo'] = df_grouped['mo'].map(dict(zip(df_mo['mo'], df_mo['id'])))
+df_grouped['ndu'] = df_grouped['ndu'].map(dict(zip(df_ndu['ndu'], df_ndu['id'])))
+df_grouped['sdor'] = df_grouped['sdor'].map(dict(zip(df_sdor['sdor'], df_sdor['id'])))
 df_grouped['vid_dtp'] = df_grouped['vid_dtp'].map(dict(zip(df_vid_dtp['vid_dtp'], df_vid_dtp['id'])))
 df_grouped['sost_pogodi'] = df_grouped['sost_pogodi'].map(dict(zip(df_sost_pogodi['sost_pogodi'], df_sost_pogodi['id'])))
 df_grouped['sost_proez_chasti'] = df_grouped['sost_proez_chasti'].map(dict(zip(df_sost_proez_chasti['sost_proez_chasti'], df_sost_proez_chasti['id'])))
@@ -192,6 +201,8 @@ df_grouped.to_csv(file_dtp_path_output, index=False)
 df_narusheniya.to_csv(narusheniya_dict_path_output, index=False)
 
 df_mo.to_csv(mo_dict_path_output, index=False)
+df_ndu.to_csv(ndu_dict_path_output, index=False)
+df_sdor.to_csv(sdor_dict_path_output, index=False)
 df_vid_dtp.to_csv(vid_dtp_dict_path_output, index=False)
 df_sost_pogodi.to_csv(sost_pogodi_dict_path_output, index=False)
 df_sost_proez_chasti.to_csv(sost_proez_chasti_dict_path_output, index=False)

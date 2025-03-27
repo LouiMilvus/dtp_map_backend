@@ -5,6 +5,8 @@ FILE_DTP_PATH_OUTPUT = "data/dtp/output/output.csv"
 # Пути для различных справочников
 FILE_PATH_NARUSHENIYA = "data/dict/narusheniya.csv"
 FILE_PATH_MO = "data/dict/mo.csv"
+FILE_PATH_NDU = "data/dict/ndu.csv"
+FILE_PATH_SDOR = "data/dict/sdor.csv"
 FILE_PATH_VID_DTP = "data/dict/vid_dtp.csv"
 FILE_PATH_SOST_POGODI = "data/dict/sost_pogodi.csv"
 FILE_PATH_SOST_PROEZ_CHASTI = "data/dict/sost_proez_chasti.csv"

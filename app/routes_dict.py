@@ -51,3 +51,8 @@ def get_uchrez_type():
 def get_vid_dtp():
     data = load_csv('vid_dtp.csv')
     return jsonify(data)
+
+@dict_bp.route('/dict/vid_ndu', methods=['GET'])
+def get_vid_ndu():
+    data = load_csv('ndu.csv')
+    return jsonify(data)

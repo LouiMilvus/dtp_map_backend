@@ -2,12 +2,9 @@ openapi: 3.0.0
 info:
   title: DTP Map API
   description: API для получения данных по ДТП, объектам и словарям
-  version: 1.0.1
-
-
+  version: 1.0.3
 
 paths:
-
   # =========================
   # Маршруты для ДТП
   # =========================
@@ -77,7 +74,7 @@ paths:
           description: ID карточки ДТП
           schema:
             type: integer
-            example: 221973828
+            example: 222033880
       responses:
         "200":
           description: Успешный ответ с карточкой ДТП
@@ -91,11 +88,19 @@ paths:
                     properties:
                       title:
                         type: string
-                        example: "ID карточки"
+                        example: "Номер ДТП"
                       value:
                         type: integer
                         example: 221973828
-
+                  address:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: "Адрес"
+                      value:
+                        type: string
+                        example: "ул. Ленина, 25"
                   date_dtp:
                     type: object
                     properties:
@@ -105,7 +110,6 @@ paths:
                       value:
                         type: string
                         example: "12.03.2024"
-
                   vid_dtp:
                     type: object
                     properties:
@@ -113,9 +117,17 @@ paths:
                         type: string
                         example: "Вид ДТП"
                       value:
-                        type: integer
-                        example: 3
-
+                        type: string
+                        example: "Столкновение"
+                  ndu:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: "Проблемы УДС (перегон)"
+                      value:
+                        type: string
+                        example: "Отсутствие разметки"
                   mo:
                     type: object
                     properties:
@@ -123,19 +135,17 @@ paths:
                         type: string
                         example: "Муниципальный округ"
                       value:
-                        type: integer
-                        example: 1
-
+                        type: string
+                        example: "Кемеровский городской округ"
                   sost_pogodi:
                     type: object
                     properties:
                       title:
                         type: string
-                        example: "Состояние погоды"
+                        example: "Погода"
                       value:
-                        type: integer
-                        example: 5
-
+                        type: string
+                        example: "Пасмурно"
                   sost_proez_chasti:
                     type: object
                     properties:
@@ -143,9 +153,8 @@ paths:
                         type: string
                         example: "Состояние проезжей части"
                       value:
-                        type: integer
-                        example: 2
-
+                        type: string
+                        example: "Обработано противогололедными материалами"
                   osveshenie:
                     type: object
                     properties:
@@ -153,49 +162,46 @@ paths:
                         type: string
                         example: "Освещение"
                       value:
-                        type: integer
-                        example: 4
-
+                        type: string
+                        example: "В темное время суток, освещение включено"
                   vina:
                     type: object
                     properties:
                       title:
                         type: string
-                        example: "Вина"
+                        example: "Нарушения"
                       value:
                         type: array
                         items:
                           type: object
                           properties:
-                            number_ts:
+                            uch:
                               type: object
                               properties:
                                 title:
                                   type: string
-                                  example: "Транспортное средство №"
-                                value:
-                                  type: string
-                                  example: "1"
-
-                            driver:
-                              type: object
-                              properties:
-                                title:
-                                  type: string
-                                  example: "Водитель"
+                                  example: "Участник ДТП"
                                 value:
                                   type: object
                                   properties:
-                                    stepen_tyazhesti:
+                                    type:
                                       type: object
                                       properties:
                                         title:
                                           type: string
-                                          example: "Степень тяжести"
+                                          example: "Участник"
                                         value:
                                           type: string
-                                          example: "Не пострадал"
-
+                                          example: "Водитель"
+                                    ts:
+                                      type: object
+                                      properties:
+                                        title:
+                                          type: string
+                                          example: "Транспортное средство"
+                                        value:
+                                          type: string
+                                          example: "1"
                                     narushenie:
                                       type: object
                                       properties:
@@ -205,18 +211,8 @@ paths:
                                         value:
                                           type: array
                                           items:
-                                            type: integer
-                                            example: 87
-
-                            passenger:
-                              type: object
-                              properties:
-                                title:
-                                  type: string
-                                  example: "Пассажир"
-                                value:
-                                  type: object
-                                  properties:
+                                            type: string
+                                            example: "Выезд на полосу встречного движения"
                                     stepen_tyazhesti:
                                       type: object
                                       properties:
@@ -226,49 +222,25 @@ paths:
                                         value:
                                           type: string
                                           example: "Ранен"
+                  pogibshie:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: "Погибшие"
+                      value:
+                        type: integer
+                        example: 2
+                  ranenie:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: "Раненые"
+                      value:
+                        type: integer
+                        example: 3
 
-                                    narushenie:
-                                      type: object
-                                      properties:
-                                        title:
-                                          type: string
-                                          example: "Нарушения"
-                                        value:
-                                          type: array
-                                          items:
-                                            type: integer
-                                            example: 77
-
-                            pedestrian:
-                              type: object
-                              properties:
-                                title:
-                                  type: string
-                                  example: "Пешеход"
-                                value:
-                                  type: object
-                                  properties:
-                                    stepen_tyazhesti:
-                                      type: object
-                                      properties:
-                                        title:
-                                          type: string
-                                          example: "Степень тяжести"
-                                        value:
-                                          type: string
-                                          example: "Погиб"
-
-                                    narushenie:
-                                      type: object
-                                      properties:
-                                        title:
-                                          type: string
-                                          example: "Нарушения"
-                                        value:
-                                          type: array
-                                          items:
-                                            type: integer
-                                            example: 65
 
   # =========================
   # Маршруты для объектов
@@ -473,6 +445,27 @@ paths:
                     id:
                       type: integer
                       example: 1
-                    vid_dtp:
+                    name:
                       type: string
                       example: "Детский сад"
+
+  /dtp/api/dict/vid_ndu:
+    get:
+      summary: Словарь видов "Недостатки транспортно эксплуатационного содержания улично дорожной сети"
+      description: Возвращает данные по видам "Недостатки транспортно эксплуатационного содержания улично дорожной сети".
+      responses:
+        "200":
+          description: Успешный ответ с данными видов "Недостатки транспортно эксплуатационного содержания улично дорожной сети"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    vid_dtp:
+                      type: string
+                      example: "Отсутствие тротуаров (пешеходных дорожек)"
